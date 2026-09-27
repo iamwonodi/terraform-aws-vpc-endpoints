@@ -49,11 +49,11 @@ gateway_endpoints = {
 }
 
 interface_endpoints = {
-  ecr.api       = {}
-  ecr.dkr       = {}
-  ssm           = {}
-  ssmmessages   = {}
-  ec2messages  = {}
+  "ecr.api"      = {}
+  "ecr.dkr"      = {}
+  ssm            = {}
+  ssmmessages    = {}
+  ec2messages    = {}
   secretsmanager = {}
   kms            = {}
 }
@@ -128,8 +128,8 @@ Interface endpoints are configured using:
 
 ```hcl
 interface_endpoints = {
-  ecr.api = {}
-  ecr.dkr = {}
+  "ecr.api" = {}
+  "ecr.dkr" = {}
   ssm = {}
   ssmmessages = {}
   ec2messages = {}
@@ -142,7 +142,7 @@ Private DNS is enabled by default:
 
 ```hcl
 interface_endpoints = {
-  ecr.api = {
+  "ecr.api" = {
     private_dns_enabled = true
   }
 }
@@ -152,7 +152,7 @@ It can be disabled for an individual endpoint when required:
 
 ```hcl
 interface_endpoints = {
-  ecr.api = {
+  "ecr.api" = {
     private_dns_enabled = false
   }
 }
@@ -222,7 +222,7 @@ The endpoint security group should normally allow inbound TCP/443 from the secur
 
 ```hcl
 module "vpc_endpoints" {
-  source = "git::https://github.com/iamwonodi/terraform-aws-vpc-endpoints.git?ref=v1.0.0"
+  source = "git::https://github.com/iamwonodi/terraform-aws-vpc-endpoints.git?ref=v1.0.1"
 
   project_name = var.project_name
   environment  = var.environment
@@ -243,8 +243,8 @@ module "vpc_endpoints" {
   }
 
   interface_endpoints = {
-    ecr.api = {}
-    ecr.dkr = {}
+    "ecr.api" = {}
+    "ecr.dkr" = {}
     ssm = {}
     ssmmessages = {}
     ec2messages = {}
@@ -372,8 +372,10 @@ Before committing the module:
 terraform fmt -recursive
 terraform init
 terraform validate
-terraform plan
+terraform test
 ```
+
+`terraform test` plans the module against a mocked AWS provider (no credentials needed), including with subnet IDs that are unknown until apply.
 
 The complete example can be validated independently:
 
@@ -384,6 +386,15 @@ terraform init
 terraform validate
 terraform plan
 ```
+
+## Releases
+
+`v1.0.1` fixes two problems in `v1.0.0`:
+
+* With `deploy_interface_endpoints_across_azs = false` (the default), the module indexed `interface_subnet_ids`, a set, which Terraform does not allow, so every plan with interface endpoints failed. It now uses the first subnet ID of the set in sorted order, which is stable between plans.
+* Service names containing a dot (`ecr.api`, `ecr.dkr`) must be quoted as map keys. The complete example and the snippets in this README now quote them.
+
+Inputs and outputs are unchanged.
 
 ## Repository Structure
 

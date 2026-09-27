@@ -57,8 +57,8 @@ variable "interface_endpoints" {
   description = "Interface endpoint services and their optional private DNS and endpoint policy settings."
 
   default = {
-    ecr.api        = {}
-    ecr.dkr        = {}
+    "ecr.api"      = {}
+    "ecr.dkr"      = {}
     ssm            = {}
     ssmmessages    = {}
     ec2messages    = {}

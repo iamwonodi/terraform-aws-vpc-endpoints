@@ -5,10 +5,12 @@ locals {
   endpoint_name_prefix = "${var.project_name}-${var.environment}-vpc-endpoint"
 
 
+  # A set has no index, so the single-subnet case takes the first element of
+  # the set as a list: the lowest subnet ID, which is stable across plans.
   endpoint_subnet_ids = (
     var.deploy_interface_endpoints_across_azs
     ? var.interface_subnet_ids
-    : [var.interface_subnet_ids[0]]
+    : toset([tolist(var.interface_subnet_ids)[0]])
   )
 
 
